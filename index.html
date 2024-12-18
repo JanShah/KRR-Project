@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.js"
+        integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="//cdn.datatables.net/2.1.8/js/dataTables.js"></script>
+    <link rel="stylesheet" href="//cdn.datatables.net/2.1.8/css/dataTables.dataTables.css">
+    <link rel="stylesheet" href="./css/style.css">
+    <style>
+
+    </style>
+</head>
+
+<body>
+    <div id="menuContainer">
+        <label for="openMenu">
+            <input type="checkbox" name="openMenu" id="openMenu">
+            <aside class="menu">
+                <div class="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+                <section class="content">
+                    <h2>Customisation Menu</h2>
+                </section>
+            </aside>
+        </label>
+    </div>
+    <header>
+        <nav>
+            <a href="#home">Home</a>
+            <a href="#packaging">Packaging</a>
+            <a href="#inventory">Inventory</a>
+            <a href="#sales">Sales</a>
+            <a href="#customers">Customers</a>
+            <a href="#suppliers">Suppliers</a>
+            <a href="#purchases">Purchases</a>
+        </nav>
+    </header>
+    <div id="cont">
+        <aside id="menu">
+
+        </aside>
+        <section id="test">
+
+        </section>
+    </div>
+    <main>
+        <section id="suppliers">
+            <h2>Suppliers</h2>
+            <table id="suppliersTable">
+                <thead>
+                    <tr>
+                        <th>
+                            Supplier ID
+                        </th>
+                        <th>
+                            Category
+                        </th>
+                        <th>
+                            Name
+                        </th>
+                        <th>
+                            Street Address
+                        </th>
+                        <th>
+                            City
+                        </th>
+                        <th>
+                            Postcode
+                        </th>
+                        <th>
+                            Lead Time
+                        </th>
+                        <th>
+                            Credit Limit
+                        </th>
+                        <th>
+                            Credit Days
+                        </th>
+                    </tr>
+                </thead>
+            </table>
+        </section>
+        <section id="customers">
+            <h2>Customers</h2>
+            <table id="customersTable">
+                <thead>
+                    <tr>
+                        <th>
+                            ID
+                        </th>
+                        <th>
+                            First Name
+                        </th>
+                        <th>
+                            Surname
+                        </th>
+                        <th>
+                            Street
+                        </th>
+                        <th>
+                            Town
+                        </th>
+                        <th>
+                            City
+                        </th>
+                        <th>
+                            County
+                        </th>
+                        <th>
+                            Postcode
+                        </th>
+                        <th>
+                            Orders Placed
+                        </th>
+                        <th>
+                            Total Spent
+                        </th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </section>
+        <section id="packaging">
+            <h2>Packaging</h2>
+            <table id="packagingTable">
+
+                <thead>
+                    <tr>
+                        <th colspan="5"></th>
+                        <th colspan="7">Quantity/Price per Pack</th>
+                    </tr>
+                    <tr>
+                        <th>Code</th>
+                        <th>Type</th>
+                        <th>Pack Size</th>
+                        <th>size</th>
+                        <th>Volume (mm<sup>3</sup>)</th>
+                        <th>1</th>
+                        <th>2+</th>
+                        <th>5+</th>
+                        <th>10+</th>
+                        <th>Pallet</th>
+                        <th>Pallet Size</th>
+                        <th>Total Used</th>
+                    </tr>
+                </thead>
+            </table>
+        </section>
+        <section id="inventory">
+            <h2>Inventory</h2>
+            <table id="inventoryTable">
+                <caption>note: weight (grams), dimensions (mm)</caption>
+                <thead>
+                    <tr>
+                        <th>
+                            Product ID
+                        </th>
+                        <th>
+                            Supplier ID
+                        </th>
+                        <th>
+                            Quantity
+                        </th>
+                        <th>
+                            Model
+                        </th>
+                        <th>
+                            Cost Price
+                        </th>
+                        <th>
+                            Sale Price
+                        </th>
+                        <th>
+                            Weight
+                        </th>
+                        <th>
+                            Width
+                        </th>
+                        <th>
+                            Depth
+                        </th>
+                        <th>
+                            Height
+                        </th>
+                        <th>
+                            Size
+                        </th>
+                        <th>
+                            Volume (mm)
+                        </th>
+                        <th>
+                            Orders Placed
+                        </th>
+
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </section>
+        <section id="sales">
+            <h2>Sales</h2>
+            <section id="chartOptions">
+                <button id="salesDailyBtn">Daily Sales</button>
+                <button id="salesWeeklyBtn">Weekly Sales</button>
+                <button id="salesMonthlyBtn">Monthly Sales</button>
+            </section>
+            <section class="chartContainer">
+                <canvas id="myChart"></canvas>
+            </section>
+            <table id="ordersTable">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Order ID</th>
+                        <th>Customer ID</th>
+                        <th>Items</th>
+                        <th>Order Value</th>
+                        <th>Package ID</th>
+
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </section>
+        <section id="purchases">
+            <h2>Purchases</h2>
+        </section>
+        <section id="home">
+            <h2>Home</h2>
+        </section>
+
+    </main>
+
+    <footer></footer>
+    <section id="overlay">
+        <p id="message">LOADING</p>
+    </section>
+    <script src="charts.js"></script>
+    <script type="module" src="appWithWorker.js"></script>
+</body>
+
+</html> 
