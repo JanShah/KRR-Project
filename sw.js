@@ -19,7 +19,7 @@ importScripts(
     "lib/createPurchaseOrder.js",
     "lib/activateCustomers.js",
     "lib/createProduct.js",
-    "lib/stockCode.js", 
+    "lib/stockCode.js",
     "lib/generatePurchaseOrders.js",
     "lib/generateSalesOrder.js",
     "lib/createBackOrder.js",
@@ -27,8 +27,9 @@ importScripts(
     "lib/processOrder.js",
     "lib/daysBetween.js"
 );
+const DEBUG = false;
 var db;
-var shouldDBInit = false; //change this when done
+var shouldDBInit = false; //change this to false when done
 const request = indexedDB.open("salesDB", 1);
 request.onerror = function (event) {
     console.log("Error opening database");
@@ -42,9 +43,9 @@ request.onsuccess = async function (event) {
     }
     // console.log("Database opened successfully");
 
-    const POtransaction = db.transaction(["products", "orders"], "readonly")
+    const POtransaction = db.transaction(["products", "sales"], "readonly")
     const pRequest = POtransaction.objectStore("products").getAll()
-    const oRequest = POtransaction.objectStore("orders").getAll()
+    const oRequest = POtransaction.objectStore("sales").getAll()
     let orders, products;
     pRequest.onsuccess = () => {
         // console.log("Products:", pRequest.result);
@@ -94,7 +95,7 @@ request.onupgradeneeded = function (event) {
     if (!db.objectStoreNames.contains("invoices")) {
         db.createObjectStore("invoices", { keyPath: "invoiceNumber", autoIncrement: true });
     }
-    
+
 
     // console.log("Database tables complete");
 }
@@ -103,7 +104,7 @@ request.onupgradeneeded = function (event) {
 
 self.onmessage = async (e) => {
     const instruction = e.data.action || null;
-    console.log("Message received from main script", instruction);
+    if (DEBUG) console.log("Message received from main script", instruction);
     if (!instruction) return;
     switch (instruction) {
         case "getProducts":
@@ -126,12 +127,12 @@ self.onmessage = async (e) => {
 };
 
 function getSuppliers() {
-    if (!db) debugger;
-    new ObjectStore(db, "suppliers").getAll(["suppliers"], process)
+    if (!db) if (DEBUG) debugger;
+    new ObjectStore(db, "suppliers").getData(process)
 
     function process(suppliers) {
         const allKeys = ['supplier_id', 'name', 'street', 'city', 'postcode', 'lead_time', 'credit_limit', 'credit_time']
-        suppliers = suppliers[0].map(e => {
+        suppliers = suppliers.map(e => {
             return Object.values(e)
         })
         // debugger
@@ -140,30 +141,38 @@ function getSuppliers() {
 
 }
 
-
+function shortDate(date) {
+    const dt = new Date(date);
+    return `${dt.getUTCDate()}/${dt.getMonth()+1}/${dt.getFullYear()}`
+}
 
 function getCustomers() {
-    if (!db) debugger;
-    new ObjectStore(db, "customers").getAll(["customers", "orders"], process)
+    if (!db) if (DEBUG) debugger;
+    new ObjectStore(db, "customers").getAll(["customers"], process)
 
-    function process([cData, orders] = data) {
+    function process(data) {
         const allKeys = [
-            "ID", "Firstname", "Surname", "Street", "Town", "City", "County", "Postcode"
+            "ID", "registeredDate",
+            "Firstname", "Surname", 
+            "Street", "Town", "City", 
+            "County", "Postcode", "ordersPlaced", 
+            "totalSpent", "lastOrderDate", "active"
         ]
-        const customers = cData.map(customer => {
-            const values = allKeys.map(key => {
-                return customer[key] || ""
+
+        const customers = data[0].map(i => {
+            const customerInfo = [];
+            allKeys.forEach(key => {
+                if(key==="active") {
+                  customerInfo.push(i[key]?"Active": "Inactive")  
+                }
+                if(["lastOrderDate","registeredDate"].includes(key))
+                    return customerInfo.push(shortDate(i[key]))
+                    customerInfo.push(i[key] || 0)
             })
-            const cOrders = orders.filter(order => {
-                return order.customer === Number(customer.ID);
-            })
-            const ordersValue = cOrders.reduce((acc, curr) => {
-                return acc + getOrderValue(curr);
-            }, 0)
-            values.push(cOrders.length)
-            values.push("£" + ordersValue.toFixed(2))
-            return values
-        });
+            return customerInfo
+        })
+        debugger
+
         self.postMessage({ type: "customers", customers })
     }
 
@@ -171,45 +180,18 @@ function getCustomers() {
 
 function getPackaging() {
 
-    if (!db) debugger
-    const transaction = db.transaction(["boxes", "orders"], "readonly");
-    const oRequest = transaction.objectStore("orders").getAll()
-    const store = transaction.objectStore("boxes");
-    const bRequest = store.getAll();
-    let boxes, orders;
-    oRequest.onsuccess = function (event) {
-        orders = event.target.result;
-    }
-    oRequest.onerror = function (event) {
-        console.error("Error: ", event)
-    }
+    if (!db) if (DEBUG) debugger
+    // const transaction = db.transaction("boxes", "readonly");
+    new ObjectStore(db, "boxes").getData(process)
 
-    bRequest.onerror = function () {
-        // console.log("Error retrieving packages");
-        self.postMessage({ type: "packages", packages: null });
-    };
-
-    transaction.oncomplete = function () {
-        const boxesUsed = boxDemandSummary(orders, "monthly");
-
-        const allBoxDemand = boxesUsed.reduce((acc, curr) => {
-            Object.keys(curr).forEach(key => {
-                if (!acc[key]) acc[key] = 0;
-                acc[key] += curr[key].totalOrders;
-            })
-            return acc;
-        }, {})
-        const packages = boxes.sort((a, b) => {
-            const pA = a['price breaks']['price per pack'][0] / a.pack
-            const pB = b['price breaks']['price per pack'][0] / b.pack
-            return pA - pB
-        }).map(box => {
+    function process(boxes) {
+        const packages = boxes.map(box => {
             const dt = [
                 box.code,
                 box.type,
                 box.pack,
                 box.size.join('x'),
-                flatVolume(...box.size)
+                box.volume
             ];
             box['price breaks']['price per pack'].forEach((price, index, arr) => {
                 dt.push("£" + price.toFixed(2))
@@ -217,24 +199,45 @@ function getPackaging() {
                     dt.push(box['price breaks']['quantities'][index])
                 }
             })
-            dt.push(allBoxDemand[box.code] || 0)
+            dt.push(box.used || 0)
             return dt
 
         })
         // console.log("Packages retrieved successfully:");
-        self.postMessage({ type: "packaging", orders, packages })
+        self.postMessage({ type: "packaging", packages })
     }
 
-    bRequest.onsuccess = function (event) {
-        boxes = event.target.result;
-        // self.postMessage({ type: "packaging", packages });
-    }
+    // const store = transaction.objectStore("boxes");
+    // const bRequest = store.getAll();
+    // let boxes;
+
+    // bRequest.onsuccess = function () {
+    //     // console.log("Error retrieving packages");
+    //     boxes = event.target.result;
+    // };
+    // bRequest.onerror = function () {
+    //     // console.log("Error retrieving packages");
+    //     self.postMessage({ type: "packages", packages: null });
+    // };
+
+    // transaction.oncomplete = function () {
+
+
+    // }
+
+
+
+
+    // bRequest.onsuccess = function (event) {
+    //     boxes = event.target.result;
+    //     // self.postMessage({ type: "packaging", packages });
+    // }
 
 }
 
 function getProducts() {
 
-    if (!db) debugger
+    if (!db) if (DEBUG) debugger
     const transaction = db.transaction("products", "readonly");
     const store = transaction.objectStore("products");
     const request = store.getAll();
@@ -251,18 +254,18 @@ function getProducts() {
 }
 
 async function getOrders() {
-    if (!db) debugger
+    if (!db) if (DEBUG) debugger
     const transaction = db.transaction("orders", "readonly");
     const request = transaction.objectStore("orders").getAll();
     //if there are no records return failure or null 
     request.onerror = function () {
         // console.log("Error retrieving orders");
-        self.postMessage({ type: "orders", orders: null });
+        self.postMessage({ type: "purchaseOrders", orders: null });
     };
 
 
     request.onsuccess = function (event) {
-        // console.log("Orders retrieved successfully:", event.target.result);
-        self.postMessage({ type: "orders", orders: event.target.result });
+        if (DEBUG) console.log("Purchase orders retrieved successfully:", event.target.result);
+        self.postMessage({ type: "purchaseOrders", orders: event.target.result });
     }
 }
