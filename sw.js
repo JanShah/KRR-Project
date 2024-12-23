@@ -12,7 +12,6 @@ importScripts(
     "lib/boxDemandSummary.js",
     "lib/basicSummary.js",
     "lib/getWeekNumber.js",
-    "lib/getOrderValue.js",
     "lib/ObjectStore.js",
     "lib/weightedRandom.js",
     "lib/packageCalculation.js",
@@ -25,7 +24,9 @@ importScripts(
     "lib/createBackOrder.js",
     "lib/getUsedVolume.js",
     "lib/processOrder.js",
-    "lib/daysBetween.js"
+    "lib/daysBetween.js",
+    "lib/shortDate.js",
+    "lib/createObjectStores.js"
 );
 const DEBUG = false;
 var db;
@@ -41,65 +42,16 @@ request.onsuccess = async function (event) {
         await initDB(db);
         shouldDBInit = false;
     }
-    // console.log("Database opened successfully");
 
-    const POtransaction = db.transaction(["products", "sales"], "readonly")
-    const pRequest = POtransaction.objectStore("products").getAll()
-    const oRequest = POtransaction.objectStore("sales").getAll()
-    let orders, products;
-    pRequest.onsuccess = () => {
-        // console.log("Products:", pRequest.result);
-        products = pRequest.result;
-    };
-
-
-    oRequest.onsuccess = () => {
-        // console.log("Orders:", oRequest.result);
-        orders = oRequest.result;
-    };
-
-    POtransaction.oncomplete = function (event) {
-
-        self.postMessage({ type: "productOrderData", orders, products })
-    }
-    POtransaction.onerror = function () {
-        // console.log("Error getting data from database");
-    }
     self.postMessage({ type: "setup", success: true })
 }
 
 request.onupgradeneeded = function (event) {
     shouldDBInit = true;
     db = event.target.result;
-    if (!db.objectStoreNames.contains("products")) {
-        db.createObjectStore("products", { keyPath: "code", autoIncrement: true });
-    }
-    if (!db.objectStoreNames.contains("boxes")) {
-        db.createObjectStore("boxes", { keyPath: "code" });
-    }
-    if (!db.objectStoreNames.contains("customers")) {
-        db.createObjectStore("customers", { keyPath: "ID", autoIncrement: true });
-    }
-    if (!db.objectStoreNames.contains("sales")) {
-        db.createObjectStore("sales", { keyPath: "id", autoIncrement: true });
-    }
+    createObjectStores(event.target.result)
 
-    if (!db.objectStoreNames.contains("orders")) {
-        db.createObjectStore("orders", { keyPath: "orderNumber", autoIncrement: true });
-    }
-
-    if (!db.objectStoreNames.contains("suppliers")) {
-        db.createObjectStore("suppliers", { keyPath: "supplier_id", autoIncrement: true });
-    }
-
-    if (!db.objectStoreNames.contains("invoices")) {
-        db.createObjectStore("invoices", { keyPath: "invoiceNumber", autoIncrement: true });
-    }
-
-
-    // console.log("Database tables complete");
 }
-
 
 
 self.onmessage = async (e) => {
@@ -107,165 +59,133 @@ self.onmessage = async (e) => {
     if (DEBUG) console.log("Message received from main script", instruction);
     if (!instruction) return;
     switch (instruction) {
+        case "getSupplier":
+            return getSupplierInfo(e.data.supplier);
         case "getProducts":
-            getProducts();
+            return getProducts();
         case "getOrders":
-            getOrders();
-            break;
+            return getOrders();
+        case "getSales":
+            return getSales();
         case "getPackaging":
-            getPackaging();
-            break;
+            return getPackaging();
         case "getCustomers":
-            getCustomers();
-            break;
+            return getCustomers();
         case "getSuppliers":
-            getSuppliers();
-            break;
+            return getSuppliers();
+        case "getInvoices":
+            return getInvoices();
+        case "getSummary":
+            return getCounts();
         default:
+            console.warn("possible unhandled request", e)
             return null;
     }
 };
 
-function getSuppliers() {
-    if (!db) if (DEBUG) debugger;
-    new ObjectStore(db, "suppliers").getData(process)
-
-    function process(suppliers) {
-        const allKeys = ['supplier_id', 'name', 'street', 'city', 'postcode', 'lead_time', 'credit_limit', 'credit_time']
-        suppliers = suppliers.map(e => {
-            return Object.values(e)
-        })
-        // debugger
-        self.postMessage({ type: "suppliers", suppliers })
+function getSupplierInfo(ID) {
+    const data = []
+    function matchSupplier(obj) {
+        return obj.supplier.supplier_id == ID
     }
+    function matchSupplierSales(obj) {
+        return obj.items.some(items=>items.product.supplier.supplier_id == ID)
+    }
+    new ObjectStore(db, "suppliers").getOne(ID, (supplier) => {
+        data.push({
+            supplier
+        });
+        new ObjectStore(db, "orders").findBy(matchSupplier, (orders) => {
+            data.push({
+                orders
+            });
+            new ObjectStore(db, "invoices").findBy(matchSupplier, (invoice) => {
+                data.push({
+                    invoice
+                });
+                new ObjectStore(db, "sales").findBy(matchSupplierSales, (sales) => {
+                    data.push({
+                        sales
+                    });
+                    self.postMessage({ type: "supplierSummary", summary:data });
+                });
+            });
+        });
+    });
+}
+
+function getInvoices() {
+    new ObjectStore(db, "invoices").getData(invoices => {
+        self.postMessage({ type: "invoices", invoices });
+    })
+}
+
+function getCounts() {
+    new ObjectStore(db, "counts").getData(summary => {
+        self.postMessage({ type: "summary", summary });
+    })
+}
+
+function getSuppliers() {
+    new ObjectStore(db, "suppliers").getData(suppliers => {
+        self.postMessage({ type: "suppliers", suppliers })
+    })
+
 
 }
 
-function shortDate(date) {
-    const dt = new Date(date);
-    return `${dt.getUTCDate()}/${dt.getMonth()+1}/${dt.getFullYear()}`
+function getSales() {
+    new ObjectStore(db, "sales").getData(sales => {
+        const allKeys = ["paidDate", "id", "customer", "count", "total", "packageUsed"]
+        const salesData = sales.map(i => {
+            const arr = []
+            allKeys.forEach(key => {
+                if (key === "paidDate") {
+                    arr.push(shortDate(i[key]))
+                } else if (key === "customer") {
+                    arr.push(i[key].ID)
+                } else if (key === "packageUsed") {
+                    if (!i[key]) arr.push(0)
+                    else arr.push(i[key].code)
+                } else if (key === "count") {
+                    arr.push(i.items.reduce((a, c) => a + c.units, 0))
+                } else {
+                    arr.push(i[key])
+                }
+            })
+            return arr;
+        });
+        self.postMessage({ type: "sales", sales: salesData })
+    })
+
 }
 
 function getCustomers() {
-    if (!db) if (DEBUG) debugger;
-    new ObjectStore(db, "customers").getAll(["customers"], process)
+    new ObjectStore(db, "customers").getData((customers) => {
 
-    function process(data) {
-        const allKeys = [
-            "ID", "registeredDate",
-            "Firstname", "Surname", 
-            "Street", "Town", "City", 
-            "County", "Postcode", "ordersPlaced", 
-            "totalSpent", "lastOrderDate", "active"
-        ]
-
-        const customers = data[0].map(i => {
-            const customerInfo = [];
-            allKeys.forEach(key => {
-                if(key==="active") {
-                  customerInfo.push(i[key]?"Active": "Inactive")  
-                }
-                if(["lastOrderDate","registeredDate"].includes(key))
-                    return customerInfo.push(shortDate(i[key]))
-                    customerInfo.push(i[key] || 0)
-            })
-            return customerInfo
-        })
-        debugger
 
         self.postMessage({ type: "customers", customers })
-    }
+    })
+
 
 }
 
 function getPackaging() {
-
-    if (!db) if (DEBUG) debugger
-    // const transaction = db.transaction("boxes", "readonly");
-    new ObjectStore(db, "boxes").getData(process)
-
-    function process(boxes) {
-        const packages = boxes.map(box => {
-            const dt = [
-                box.code,
-                box.type,
-                box.pack,
-                box.size.join('x'),
-                box.volume
-            ];
-            box['price breaks']['price per pack'].forEach((price, index, arr) => {
-                dt.push("£" + price.toFixed(2))
-                if (index == arr.length - 1) {
-                    dt.push(box['price breaks']['quantities'][index])
-                }
-            })
-            dt.push(box.used || 0)
-            return dt
-
-        })
-        // console.log("Packages retrieved successfully:");
-        self.postMessage({ type: "packaging", packages })
-    }
-
-    // const store = transaction.objectStore("boxes");
-    // const bRequest = store.getAll();
-    // let boxes;
-
-    // bRequest.onsuccess = function () {
-    //     // console.log("Error retrieving packages");
-    //     boxes = event.target.result;
-    // };
-    // bRequest.onerror = function () {
-    //     // console.log("Error retrieving packages");
-    //     self.postMessage({ type: "packages", packages: null });
-    // };
-
-    // transaction.oncomplete = function () {
-
-
-    // }
-
-
-
-
-    // bRequest.onsuccess = function (event) {
-    //     boxes = event.target.result;
-    //     // self.postMessage({ type: "packaging", packages });
-    // }
-
+    new ObjectStore(db, "boxes").getData((boxes) => {
+        self.postMessage({ type: "packaging", boxes })
+    });
 }
 
 function getProducts() {
+    new ObjectStore(db, "products").getData((products) => {
 
-    if (!db) if (DEBUG) debugger
-    const transaction = db.transaction("products", "readonly");
-    const store = transaction.objectStore("products");
-    const request = store.getAll();
-    request.onerror = function () {
-        // console.log("Error retrieving products");
-        self.postMessage({ type: "products", products: null });
-    };
-
-    request.onsuccess = function (event) {
-        // console.log("Products retrieved successfully:", event.target.result);
-        self.postMessage({ type: "getProducts", products: event.target.result });
-    }
-
+        self.postMessage({ type: "products", products });
+    });
 }
 
 async function getOrders() {
-    if (!db) if (DEBUG) debugger
-    const transaction = db.transaction("orders", "readonly");
-    const request = transaction.objectStore("orders").getAll();
-    //if there are no records return failure or null 
-    request.onerror = function () {
-        // console.log("Error retrieving orders");
-        self.postMessage({ type: "purchaseOrders", orders: null });
-    };
+    new ObjectStore(db, "orders").getData((orders) => {
 
-
-    request.onsuccess = function (event) {
-        if (DEBUG) console.log("Purchase orders retrieved successfully:", event.target.result);
-        self.postMessage({ type: "purchaseOrders", orders: event.target.result });
-    }
+        self.postMessage({ type: "purchaseOrders", orders });
+    });
 }

@@ -1,6 +1,6 @@
 let chart;
 function createSalesChart(data, period) {
-    if(chart) {
+    if (chart) {
         chart.destroy();
     }
     const ctx = document.getElementById('myChart');
@@ -18,6 +18,7 @@ function createSalesChart(data, period) {
             }]
         },
         options: {
+            responsive: true,
             scales: {
                 y: {
                     beginAtZero: true

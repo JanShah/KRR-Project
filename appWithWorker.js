@@ -8,8 +8,6 @@ async function start() {
     };
 }
 
-
-
-
-
-
+window.addEventListener('hashchange', e=>{
+    document.title = window.location.hash.slice(1);
+})

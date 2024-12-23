@@ -27,7 +27,17 @@
                     <span></span>
                 </div>
                 <section class="content">
-                    <h2>Customisation Menu</h2>
+                    <h2>Menu</h2>
+                    <nav>
+                        <a href="#home">Home</a>
+                        <a href="#packaging">Packaging</a>
+                        <a href="#inventory">Inventory</a>
+                        <a href="#sales">Sales</a>
+                        <a href="#customers">Customers</a>
+                        <a href="#suppliers">Suppliers</a>
+                        <a href="#purchases">Purchases</a>
+                        <a href="#invoices">Invoices</a>
+                    </nav>
                 </section>
             </aside>
         </label>
@@ -146,8 +156,9 @@
 
                 <thead>
                     <tr>
-                        <th colspan="5"></th>
-                        <th colspan="7">Quantity/Price per Pack</th>
+                        <th colspan="5">Information</th>
+                        <th colspan="6">Quantity/Price per Pack</th>
+                        <th colspan="2">Stock</th>
                     </tr>
                     <tr>
                         <th>Code</th>
@@ -162,6 +173,7 @@
                         <th>Pallet</th>
                         <th>Pallet Size</th>
                         <th>Total Used</th>
+                        <th>In stock</th>
                     </tr>
                 </thead>
             </table>
@@ -169,11 +181,10 @@
         <section id="inventory">
             <h2>Inventory</h2>
             <table id="inventoryTable">
-                <caption>note: weight (grams), dimensions (mm)</caption>
                 <thead>
                     <tr>
                         <th>
-                            Product Code
+                            Code
                         </th>
                         <th>
                             Supplier ID
@@ -182,7 +193,7 @@
                             SKU
                         </th>
                         <th>
-                            Quantity In Stock
+                            Stock Units
                         </th>
                         <th>
                             Sold Units
@@ -203,10 +214,7 @@
                             Category
                         </th>
                         <th>
-                            Supplier Pack Size
-                        </th>
-                        <th>
-                            Popularity Score
+                            Pack
                         </th>
                         <th>
                             Date Added
@@ -246,9 +254,50 @@
         </section>
         <section id="purchases">
             <h2>Purchases</h2>
+            <table id="purchasesTable">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Order Date</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                        <th>Supplier ID</th>
+                        <th>Due Date</th>
+                        <th>Paid Date</th>
+
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </section>
+        <section id="invoices">
+            <h2>Invoices</h2>
+            <table id="invoicesTable">
+                <thead>
+                    <tr>
+                        <th>Order Date</th>
+                        <th>Paid Date</th>
+                        <th>Order number</th>
+                        <th>Amount</th>
+                        <th>Purpose</th>
+                        <th>SupplierID</th>
+
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
         </section>
         <section id="home">
             <h2>Home</h2>
+            <section class="dashboard">
+                <div><canvas id="summary1"></canvas></div>
+                <div><canvas id="summary2"></canvas></div>
+                <div><canvas id="summary3"></canvas></div>
+                <div><canvas id="summary4"></canvas></div>
+                <div><canvas id="summary5"></canvas></div>
+                <div><canvas id="summary6"></canvas></div>
+                <div><canvas id="summary7"></canvas></div>
+            </section>
         </section>
 
     </main>
@@ -257,8 +306,14 @@
     <section id="overlay">
         <p id="message">LOADING</p>
     </section>
+    <dialog id="modal">
+        <p>Greetings, one and all!</p>
+        <form method="dialog">
+          <button>OK</button>
+        </form>
+      </dialog>
     <script src="charts.js"></script>
     <script type="module" src="appWithWorker.js"></script>
 </body>
 
-</html> 
+</html>
