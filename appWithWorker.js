@@ -28,3 +28,9 @@ window.addEventListener('hashchange', e => {
     document.title = window.location.hash.slice(1);
     window.scrollTo(0,0);
 });
+
+document.getElementById('openMenu').addEventListener('change', (e)=>{
+    console.log('change detected', e.target.checked)
+    const marginLeft = e.target.checked?"251px":"0px";
+    document.getElementsByTagName('main')[0].style.marginLeft = marginLeft
+})

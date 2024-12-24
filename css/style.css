@@ -7,13 +7,13 @@ body {
 }
 
 header {
+    padding: 30px 20px;
     background-color: #0077b6;
     text-align: center;
     position: sticky;
     top: 0;
     z-index: 1;
     color: #ffffff;
-    height: 64px;
 }
 
 header nav {
@@ -39,8 +39,9 @@ header a:active {
 }
 
 main {
-    max-width: 1600px;
-    margin: 0 auto;
+    margin: 0px auto;
+    margin-left: 0px;
+    transition: all 0.3s ease-in-out;
 }
 
 main>section {
@@ -52,12 +53,11 @@ main section:target {
     background-color: #e0f7fa;
     display: block;
     padding: 20px;
-    margin: 0 auto;
-    margin-top: 1rem;
-    max-width: 90%;
+    margin: 20px;
     border-radius: 15px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     position: relative;
+    overflow: auto;
 }
 
 section.hidden,
@@ -72,8 +72,8 @@ main section:target~#home {
 
 section#overlay {
     position: absolute;
-    width: 100vw;
-    height: 100vh;
+    width: calc(100vw - 17px);
+    height: calc(100vh - 1px);
     background: rgba(0, 0, 0, 0.8);
     z-index: 2;
     top: 0;
@@ -83,6 +83,7 @@ section#overlay {
     align-items: center;
     color: #ffffff;
     letter-spacing: 1px;
+    overflow: hidden;
 }
 
 section#overlay p {
@@ -121,6 +122,7 @@ div#menuContainer {
     margin-top: 0px;
     text-align: right;
     margin-right: 30px;
+    margin-bottom: 15px;
 }
 
 #openMenu:checked~.menu .content {
@@ -129,7 +131,7 @@ div#menuContainer {
     left: 0px;
     width: 250px;
     height: 100vh;
-    box-shadow: 5px 0px 9px rgba(0, 0, 0, 0.3);
+    box-shadow: 5px 0px 6px rgba(0, 0, 0, 0.3);
 }
 
 #openMenu {
