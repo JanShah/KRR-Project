@@ -30,7 +30,7 @@ importScripts(
 );
 const DEBUG = false;
 var db;
-var startingData = { startDate: "01/01/2023", endDate: "04/01/2023", startingBudget: 5000 }
+var startingData = { startDate: "2023-01-01", endDate: "2023-04-01", startingBudget: 5000 }
 var shouldDBInit = false; //change this to false when done
 var request;
 openDB();
