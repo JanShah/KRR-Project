@@ -200,12 +200,27 @@ dialog[open] {
 section.dashboard {
     display: grid;
     grid-template:
-        "a a" 1fr
-        "b b" 1fr
-        "c c" 1fr;
-    height: 70vh;
-    grid-template-columns: 1fr 1fr;
+        "a a a" 1fr
+        "b b b" 1fr
+        "c c c" 1fr;
+    min-height: 70vh;
+    grid-template-columns: auto 2fr 2fr;
+    overflow-y: auto;
 }
 .numbericSummaries {
     display: flex;
+}
+
+form#orderGenSettings {
+    padding: 10px;
+}
+
+form#orderGenSettings label {
+    display: block;
+}
+
+form#orderGenSettings input {
+    display: block;
+    padding:5px;
+    margin: 5px 0 15px;
 }

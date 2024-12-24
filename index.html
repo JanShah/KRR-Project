@@ -38,6 +38,17 @@
                         <a href="#purchases">Purchases</a>
                         <a href="#invoices">Invoices</a>
                     </nav>
+                    <main>
+                        <form action="" id="orderGenSettings">
+                            <label for="startDateInput">Start Date</label>
+                            <input type="date" name="startDate" id="startDateInput" value="2023-01-01">
+                            <label for="endDateInput">End Date</label>
+                            <input type="date" name="endDate" id="endDateInput" value="2023-04-01">
+                            <label for="startingBudgetInput">Starting Budget</label>
+                            <input type="number" name="startingBudget" id="startingBudgetInput" value="5000">
+                            <input type="submit" value="Re-generate Data">
+                        </form>
+                    </main>
                 </section>
             </aside>
         </label>
@@ -288,13 +299,13 @@
             </table>
         </section>
         <section id="home">
-            <h2>Home</h2>
             <section class="dashboard">
-                <div><canvas id="summary1"></canvas></div>
+                <div style="grid-row: span 2;"><canvas id="summary1"></canvas></div>
                 <div><canvas id="summary2"></canvas></div>
-                <div><canvas id="summary3"></canvas></div>
                 <div><canvas id="summary4"></canvas></div>
+                <div><canvas id="summary3"></canvas></div>
                 <div><canvas id="summary5"></canvas></div>
+                <div></div>
                 <div><canvas id="summary6"></canvas></div>
                 <div><canvas id="summary7"></canvas></div>
             </section>

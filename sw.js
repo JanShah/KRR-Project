@@ -30,35 +30,59 @@ importScripts(
 );
 const DEBUG = false;
 var db;
+var startingData = { startDate: "01/01/2023", endDate: "04/01/2023", startingBudget: 5000 }
 var shouldDBInit = false; //change this to false when done
-const request = indexedDB.open("salesDB", 1);
-request.onerror = function (event) {
-    console.log("Error opening database");
-}
-request.onsuccess = async function (event) {
-    db = event.target.result;
-    if (shouldDBInit) {
-        self.postMessage({ type: "starting" })
-        await initDB(db);
-        shouldDBInit = false;
+var request;
+openDB();
+function openDB() {
+    request = indexedDB.open("salesDB", 1);
+    request.onerror = function (event) {
+        console.log("Error opening database");
+    }
+    request.onsuccess = async function (event) {
+        db = event.target.result;
+        if (shouldDBInit) {
+            self.postMessage({ type: "starting" })
+            await initDB(db, startingData);
+            shouldDBInit = false;
+            self.postMessage({ type: "configured", success: true })
+
+        }
+
+        self.postMessage({ type: "setup", success: true })
     }
 
-    self.postMessage({ type: "setup", success: true })
+    request.onupgradeneeded = function (event) {
+        shouldDBInit = true;
+        db = event.target.result;
+        createObjectStores(event.target.result)
+    }
 }
 
-request.onupgradeneeded = function (event) {
-    shouldDBInit = true;
-    db = event.target.result;
-    createObjectStores(event.target.result)
+function resetAndStartAgain(data) {
+    db.close(e => console.log(e))
+    resetRequest = indexedDB.deleteDatabase("salesDB");
+    resetRequest.onsuccess = function (event) {
+        startingData = JSON.parse(JSON.stringify(data.data))
+        startingData.startingBudget = Number(startingData.startingBudget)
+        openDB();
+    }
+    resetRequest.onerror = function (event) {
+
+        console.log("An Error occurred")
+    }
 
 }
-
 
 self.onmessage = async (e) => {
     const instruction = e.data.action || null;
     if (DEBUG) console.log("Message received from main script", instruction);
     if (!instruction) return;
     switch (instruction) {
+        case "regen":
+            return resetAndStartAgain(e.data)
+        case "getSettings":
+            return retrieveSettings()
         case "getSupplier":
             return getSupplierInfo(e.data.supplier);
         case "getProducts":
@@ -83,13 +107,19 @@ self.onmessage = async (e) => {
     }
 };
 
+function retrieveSettings() {
+    new ObjectStore(db, "settings").getOne(1, settings => {
+        self.postMessage({ type: "settings", settings })
+    })
+}
+
 function getSupplierInfo(ID) {
     const data = []
     function matchSupplier(obj) {
         return obj.supplier.supplier_id == ID
     }
     function matchSupplierSales(obj) {
-        return obj.items.some(items=>items.product.supplier.supplier_id == ID)
+        return obj.items.some(items => items.product.supplier.supplier_id == ID)
     }
     new ObjectStore(db, "suppliers").getOne(ID, (supplier) => {
         data.push({
@@ -107,7 +137,7 @@ function getSupplierInfo(ID) {
                     data.push({
                         sales
                     });
-                    self.postMessage({ type: "supplierSummary", summary:data });
+                    self.postMessage({ type: "supplierSummary", summary: data });
                 });
             });
         });

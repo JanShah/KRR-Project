@@ -1,17 +1,17 @@
 supplier_id,category,name,street,city,postcode,lead_time,credit_limit,credit_time,amount_owed
-S005,Electronics,Regency Digital,56 Crown Avenue,Leeds,LS2 8DR,7,20000,14,0
-S007,Electronics,Harlequin Matrix,34 Fleet Street,Bristol,BS1 6NX,3,50000,30,0
-S011,Gifts,Brighton Electronics Ltd.,13 Pier Road,Brighton,BN2 1TW,2,50000,50,0
-S012,Electronics,Luxe Living Co. Ltd,29 St. Marys Lane,Cambridge,CB2 1RS,2,15000,30,0
-S001,Fashion,Royal Charm Suppliers,12 Windsor Street,London,SW1A 1AA,5,10000,10,0
-S002,Gifts,Elegant Trinkets Ltd.,45 High Road,Manchester,M1 4AF,5,15000,15,0
-S004,Gifts,Majestic Touch Co.,19 Queens Way,Liverpool,L1 8JT,5,30000,30,0
-S008,Fashion,Velvet & Lace Traders,22 Crescent Road,Nottingham,NG7 1HL,3,30000,30,0
-S010,Fashion,Opulent Goods UK,81 Regent Street,Edinburgh,EH2 3DF,3,30000,30,0
-S009,Books,Heritage Heirlooms,47 Cathedral Square,Sheffield,S1 1HG,3,30000,30,0
+S005,Electronics,Regency Digital,56 Crown Avenue,Leeds,LS2 8DR,7,2000,14,0
+S007,Electronics,Harlequin Matrix,34 Fleet Street,Bristol,BS1 6NX,3,2000,30,0
+S011,Gifts,Brighton Electronics Ltd.,13 Pier Road,Brighton,BN2 1TW,2,2000,50,0
+S012,Electronics,Luxe Living Co. Ltd,29 St. Marys Lane,Cambridge,CB2 1RS,2,2000,30,0
+S001,Fashion,Royal Charm Suppliers,12 Windsor Street,London,SW1A 1AA,5,1000,10,0
+S002,Gifts,Elegant Trinkets Ltd.,45 High Road,Manchester,M1 4AF,5,5000,15,0
+S004,Gifts,Majestic Touch Co.,19 Queens Way,Liverpool,L1 8JT,5,3000,30,0
+S008,Fashion,Velvet & Lace Traders,22 Crescent Road,Nottingham,NG7 1HL,3,3000,30,0
+S010,Fashion,Opulent Goods UK,81 Regent Street,Edinburgh,EH2 3DF,3,1000,30,0
+S009,Books,Heritage Heirlooms,47 Cathedral Square,Sheffield,S1 1HG,3,1000,30,0
 S013,Books,Finesse Fancy Supplies,63 Castle Hill,York,YO1 7HZ,2,30000,30,0
-S014,Books,Prestige Goods Depot,9 Victoria Parade,Cardiff,CF10 3BH,1,15000,30,0
-S003,Gifts,Artisan Fancy Goods,78 Maple Lane,Birmingham,B2 5HG,5,30000,15,0
-S006,Tools,Somerset Styles Ltd.,8 Market Close,Bath,BA1 2JR,7,15000,15,0
-S015,Tools,Windsor Whimsy Ltd.,5 Kings Court,Oxford,OX1 2EY,10,15000,15,0
-B001,Packaging,BoxPacking,Derbyshire Ind Est. Briars Court,High Peak,SK1 1XF,1,0,0,0
+S014,Books,Prestige Goods Depot,9 Victoria Parade,Cardiff,CF10 3BH,1,1500,30,0
+S003,Gifts,Artisan Fancy Goods,78 Maple Lane,Birmingham,B2 5HG,5,1000,15,0
+S006,Tools,Somerset Styles Ltd.,8 Market Close,Bath,BA1 2JR,7,200,15,0
+S015,Tools,Windsor Whimsy Ltd.,5 Kings Court,Oxford,OX1 2EY,10,2000,15,0
+B001,Packaging,BoxPacking,Derbyshire Ind Est. Briars Court,High Peak,SK1 1XF,3,0,0,0
