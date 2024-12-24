@@ -7,13 +7,13 @@ body {
 }
 
 header {
-    padding: 30px 20px;
     background-color: #0077b6;
     text-align: center;
     position: sticky;
     top: 0;
     z-index: 1;
     color: #ffffff;
+    height: 64px;
 }
 
 header nav {
@@ -129,6 +129,7 @@ div#menuContainer {
     left: 0px;
     width: 250px;
     height: 100vh;
+    box-shadow: 5px 0px 9px rgba(0, 0, 0, 0.3);
 }
 
 #openMenu {
