@@ -23,10 +23,15 @@ importScripts(
     "lib/generateSalesOrder.js",
     "lib/createBackOrder.js",
     "lib/getUsedVolume.js",
-    "lib/processOrder.js",
+    "lib/shipSalesOrder.js",
     "lib/daysBetween.js",
     "lib/shortDate.js",
-    "lib/createObjectStores.js"
+    "lib/createObjectStores.js",
+    "lib/createDayCount.js",
+    "lib/Record.js",
+    "lib/processPayments.js",
+    "lib/salesOrderPayment.js",
+    "lib/backOrderItems.js"
 );
 const DEBUG = false;
 var db;

@@ -132,6 +132,7 @@ div#menuContainer {
     width: 250px;
     height: 100vh;
     box-shadow: 5px 0px 6px rgba(0, 0, 0, 0.3);
+    overflow: auto;
 }
 
 #openMenu {
@@ -226,4 +227,25 @@ form#orderGenSettings input {
     display: block;
     padding:5px;
     margin: 5px 0 15px;
+}
+
+form#parameters input {
+    padding: 5px;
+}
+
+form#parameters label {
+    display: inline-block;
+    min-width: 65px;
+}
+form#parameters div {
+    display: flex;
+    gap: 5px;
+    justify-content: flex-start;
+    margin: 10px 0;
+    align-items: center;
+}
+
+form#parameters .options label {
+    display: unset;
+    min-width: 0;
 }

@@ -37,6 +37,7 @@
                         <a href="#suppliers">Suppliers</a>
                         <a href="#purchases">Purchases</a>
                         <a href="#invoices">Invoices</a>
+                        <a href="#adviser">Optimal Orders</a>
                     </nav>
                     <section>
                         <form action="" id="orderGenSettings">
@@ -54,7 +55,7 @@
         </label>
     </div>
     <header>
-      
+
     </header>
     <div id="cont">
         <aside id="menu">
@@ -103,6 +104,33 @@
                     </tr>
                 </thead>
             </table>
+        </section>
+        <section id="adviser">
+            <h2>Packaging Order Adviser</h2>
+            <section>
+                <form id="parameters">
+                    <div>
+                        <label for="timeHorizon">Time</label>
+                        <input type="number" name="timeHorizon" id="timeHorizon">
+                    </div>
+                    <div class="options">
+                        <label for="daysOption">Days</label>
+                        <input type="radio" name="daysWeeksMonths" value="days" id="daysOption">
+                        <label for="weeksOption">Weeks</label>
+                        <input type="radio" name="daysWeeksMonths" value="weeks" id="weeksOption">
+                        <label for="monthsOption">Months</label>
+                        <input type="radio" name="daysWeeksMonths" value="months" id="monthsOption">
+                    </div>
+                    <div>
+                        <label for="budget">Budget</label>
+                        <input type="number" name="budget" id="budget">
+                    </div>
+                    <div>
+                        <label for="space">Space %</label>
+                        <input type="number" name="maxSpace" id="maxSpace">
+                    </div>
+                </form>
+            </section>
         </section>
         <section id="customers">
             <h2>Customers</h2>
@@ -312,9 +340,9 @@
     <dialog id="modal">
         <p>Greetings, one and all!</p>
         <form method="dialog">
-          <button>OK</button>
+            <button>OK</button>
         </form>
-      </dialog>
+    </dialog>
     <script src="charts.js"></script>
     <script type="module" src="appWithWorker.js"></script>
 </body>
