@@ -1,8 +1,10 @@
 import messageHandler from "./lib/messageHandler.js";
 window.addEventListener("DOMContentLoaded", start);
-
+import "./lib/getWorkAction.js";
+const getWorkAction = globalThis._sharedLogic.getWorkAction
+let dbWorker
 async function start() {
-    const dbWorker = new Worker("sw.js");
+    dbWorker = new Worker("sw.js");
     dbWorker.onmessage = (event) => {
         messageHandler(dbWorker, event.data)
     };
@@ -13,24 +15,28 @@ async function start() {
         const startingBudget = e.target.startingBudgetInput.value
         document.getElementById("message").innerText = "Restarting..."
         overlay.classList.remove('hidden')
-        setTimeout(()=>{
+        setTimeout(() => {
             dbWorker.postMessage({
                 action: "regen", data: {
                     startDate, endDate, startingBudget
                 }
             })
-        },500)
+        }, 500)
 
-    })
+    });
 }
 
 window.addEventListener('hashchange', e => {
-    document.title = window.location.hash.slice(1);
-    window.scrollTo(0,0);
+    const page = window.location.hash.slice(1);
+    const workerAction = getWorkAction();
+    dbWorker.postMessage({action:workerAction})
+
+    document.title = "Order Manager - " + page;
+    window.scrollTo(0, 0);
 });
 
-document.getElementById('openMenu').addEventListener('change', (e)=>{
+document.getElementById('openMenu').addEventListener('change', (e) => {
     console.log('change detected', e.target.checked)
-    const marginLeft = e.target.checked?"251px":"0px";
+    const marginLeft = e.target.checked ? "251px" : "0px";
     document.getElementsByTagName('main')[0].style.marginLeft = marginLeft
 })

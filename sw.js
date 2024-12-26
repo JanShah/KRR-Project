@@ -92,8 +92,8 @@ self.onmessage = async (e) => {
             return getSupplierInfo(e.data.supplier);
         case "getProducts":
             return getProducts();
-        case "getOrders":
-            return getOrders();
+        case "getPurchases":
+            return getPurchases();
         case "getSales":
             return getSales();
         case "getPackaging":
@@ -106,6 +106,9 @@ self.onmessage = async (e) => {
             return getInvoices();
         case "getSummary":
             return getCounts();
+        case "complete":
+            self.postMessage({ type: "completed" });
+            break;
         default:
             console.warn("possible unhandled request", e)
             return null;
@@ -218,7 +221,7 @@ function getProducts() {
     });
 }
 
-async function getOrders() {
+async function getPurchases() {
     new ObjectStore(db, "orders").getData((orders) => {
 
         self.postMessage({ type: "purchaseOrders", orders });
