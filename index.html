@@ -107,30 +107,50 @@
         </section>
         <section id="adviser">
             <h2>Procurement Adviser</h2>
-            <section>
-                <form id="parameters">
-                    <div>
-                        <label for="timeHorizon">Time</label>
-                        <input type="number" name="timeHorizon" id="timeHorizon">
-                    </div>
-                    <div class="options">
-                        <label for="daysOption">Days</label>
-                        <input type="radio" name="daysWeeksMonths" value="days" id="daysOption">
-                        <label for="weeksOption">Weeks</label>
-                        <input type="radio" name="daysWeeksMonths" value="weeks" id="weeksOption">
-                        <label for="monthsOption">Months</label>
-                        <input type="radio" name="daysWeeksMonths" value="months" id="monthsOption">
-                    </div>
-                    <div>
-                        <label for="budget">Budget</label>
-                        <input type="number" name="budget" id="budget">
-                    </div>
-                    <div>
-                        <label for="space">Space %</label>
-                        <input type="number" name="maxSpace" id="maxSpace">
-                    </div>
-                </form>
-            </section>
+            <article id="advisers">
+                <section>
+                    <form id="parameters">
+                        <fieldset>
+                            <legend>Model Range</legend>
+                            <div>
+                                <label for="timeHorizon">Time</label>
+                                <input type="number" name="timeHorizon" id="timeHorizon">
+                            </div>
+                            <div class="options">
+                                <label for="daysOption">Days</label>
+                                <input type="radio" name="daysWeeksMonths" value="days" id="daysOption">
+                                <label for="weeksOption">Weeks</label>
+                                <input type="radio" name="daysWeeksMonths" value="weeks" id="weeksOption">
+                                <label for="monthsOption">Months</label>
+                                <input type="radio" name="daysWeeksMonths" value="months" id="monthsOption">
+                            </div>
+                        </fieldset>
+                        <fieldset>
+                            <legend>Order size</legend>
+                            <div>
+                                <label for="budget">Budget</label>
+                                <input type="number" name="budget" id="budget">
+                            </div>
+                            <div>
+                                <label for="weeksOfCover">Cover</label>
+                                <input type="number" name="weeksOfCover" id="weeksOfCover">
+
+                            </div>
+                            <div>
+                                <label for="space">Space %</label>
+                                <input type="number" name="maxSpace" id="maxSpace">
+                            </div>
+                        </fieldset>
+                        <div>
+                            <input type="submit" value="Resolve">
+                        </div>
+                    </form>
+                    <div id="bayesianChartBtns"></div>
+                </section>
+                <section id="forecastingCharts">
+                    <canvas id="forecastChart" width="400" height="200"></canvas>
+                </section>
+            </article>
         </section>
         <section id="customers">
             <h2>Customers</h2>
@@ -277,6 +297,7 @@
                         <th>Items</th>
                         <th>Order Value</th>
                         <th>Package ID</th>
+                        <th>Status</th>
 
                     </tr>
                 </thead>

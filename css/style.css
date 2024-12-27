@@ -249,3 +249,18 @@ form#parameters .options label {
     display: unset;
     min-width: 0;
 }
+
+#advisers {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+#forecastingCharts {
+    flex:2
+}
+
+#bayesianChartBtns {
+    max-width: 300px;
+}

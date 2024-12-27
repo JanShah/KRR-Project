@@ -109,11 +109,80 @@ self.onmessage = async (e) => {
         case "complete":
             self.postMessage({ type: "completed" });
             break;
+        case "getAdviser":
+            self.postMessage({ type: "runAdviser" })
+            break;
+
+        case "getFilteredPurchases":
+            return getFilteredPurchases(e.data.data)
+            break;
         default:
             console.warn("possible unhandled request", e)
             return null;
     }
 };
+
+function getFilteredPurchases(data) {
+    new ObjectStore(db, "settings").getOne(1, handledSettings.bind(data))
+    function handledSettings(settings) {
+        settings.supplier = this.query.supplier
+        settings.days = this.query.noOfDays
+        settings.postBack = this.query.postBack
+        const store = new ObjectStore(db, "orders").findBy(search.bind(settings), completeSearch.bind(settings))
+    }
+    function search(result) {
+        const end = new Date(this.endDate);
+        return daysBetween(end, result.date) < (this.days + this.days) &&
+            this.supplier === result.supplier.supplier_id
+    }
+    function completeSearch(data) {
+        const end = new Date(this.endDate);
+
+        const dataset = [];
+        const prior = [];
+        const future = [];
+        data.forEach(order => {
+            order.products.forEach(p => {
+                const orderData = {
+                    date: order.date,
+                    code: p.product.code,
+                    qty: Math.floor(p.units / p.product.pack),
+                    paid: p.lineTotal,
+                }
+                if (daysBetween(end, order.date) > this.days)
+                    prior.push(orderData)
+                else
+                    future.push(orderData)
+            });
+        })
+        this.prior = prior
+        this.future = future;
+        new ObjectStore(db, "boxes").getData(postAll.bind(this))
+        function postAll(boxes) {
+            self.postMessage({
+                type: this.postBack,
+                data: {
+                    prior: aggregateWeekly(this.prior, this.startDate),
+                    future: aggregateWeekly(this.future, this.startDate),
+                    boxes
+                },
+            });
+        }
+    }
+}
+
+function aggregateWeekly(purchaseOrders, startDate) {
+    const year = new Date(startDate).getFullYear();
+    const weeklyData = {};
+    purchaseOrders.forEach(({ date, code, qty }) => {
+        const week = getWeekNumber(date, year);
+        if (!weeklyData[week]) weeklyData[week] = {};
+        if (!weeklyData[week][code]) weeklyData[week][code] = 0;
+        weeklyData[week][code] += qty;
+    });
+    return weeklyData;
+};
+
 
 function retrieveSettings() {
     new ObjectStore(db, "settings").getOne(1, settings => {
@@ -174,7 +243,8 @@ function getSuppliers() {
 
 function getSales() {
     new ObjectStore(db, "sales").getData(sales => {
-        const allKeys = ["paidDate", "id", "customer", "count", "total", "packageUsed"]
+        const allKeys = ["paidDate", "id", "customer", "count", "total", "packageUsed", "status"]
+        debugger
         const salesData = sales.map(i => {
             const arr = []
             allKeys.forEach(key => {
@@ -210,7 +280,7 @@ function getCustomers() {
 
 function getPackaging() {
     new ObjectStore(db, "boxes").getData((boxes) => {
-        self.postMessage({ type: "packaging", boxes })
+        self.postMessage({ type: postBack, boxes })
     });
 }
 

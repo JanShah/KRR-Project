@@ -29,14 +29,13 @@ async function start() {
 window.addEventListener('hashchange', e => {
     const page = window.location.hash.slice(1);
     const workerAction = getWorkAction();
-    dbWorker.postMessage({action:workerAction})
-
+    if (workerAction)
+        dbWorker.postMessage({ action: workerAction })
     document.title = "Order Manager - " + page;
     window.scrollTo(0, 0);
 });
 
 document.getElementById('openMenu').addEventListener('change', (e) => {
-    console.log('change detected', e.target.checked)
     const marginLeft = e.target.checked ? "251px" : "0px";
     document.getElementsByTagName('main')[0].style.marginLeft = marginLeft
 })
