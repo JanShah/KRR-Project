@@ -211,6 +211,7 @@ section.dashboard {
     grid-template-columns: auto 2fr 2fr;
     overflow-y: auto;
 }
+
 .numbericSummaries {
     display: flex;
 }
@@ -225,7 +226,7 @@ form#orderGenSettings label {
 
 form#orderGenSettings input {
     display: block;
-    padding:5px;
+    padding: 5px;
     margin: 5px 0 15px;
 }
 
@@ -237,6 +238,7 @@ form#parameters label {
     display: inline-block;
     min-width: 65px;
 }
+
 form#parameters div {
     display: flex;
     gap: 5px;
@@ -252,15 +254,21 @@ form#parameters .options label {
 
 #advisers {
     display: flex;
-    align-items: center;
     justify-content: center;
-    flex-wrap: wrap;
+    align-content: center;
 }
 
+#suggestedOrder,
 #forecastingCharts {
-    flex:2
+    flex: 1;
 }
 
 #bayesianChartBtns {
     max-width: 300px;
+}
+
+table.legend {
+    white-space: nowrap;
+    font-size: large;
+    padding: 10px 0;
 }

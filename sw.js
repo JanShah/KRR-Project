@@ -278,7 +278,7 @@ function getCustomers() {
 
 }
 
-function getPackaging() {
+function getPackaging(postBack="packaging") {
     new ObjectStore(db, "boxes").getData((boxes) => {
         self.postMessage({ type: postBack, boxes })
     });
