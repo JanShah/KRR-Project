@@ -35,11 +35,11 @@ importScripts(
 );
 const DEBUG = false;
 var db;
-var startingData = { startDate: "2023-01-01", endDate: "2023-04-01", startingBudget: 5000 }
+// var startingData = { startDate: "2023-01-01", endDate: "2023-04-01", startingBudget: 5000 }
 var shouldDBInit = false; //change this to false when done
 var request;
-openDB();
-function openDB() {
+openDB({ startDate: "2023-01-01", endDate: "2023-04-01", startingBudget: 5000, supplierLeadTime: 5 });
+function openDB(startingData) {
     request = indexedDB.open("salesDB", 1);
     request.onerror = function (event) {
         console.log("Error opening database");
@@ -66,11 +66,13 @@ function openDB() {
 
 function resetAndStartAgain(data) {
     db.close(e => console.log(e))
+    debugger
     resetRequest = indexedDB.deleteDatabase("salesDB");
     resetRequest.onsuccess = function (event) {
-        startingData = JSON.parse(JSON.stringify(data.data))
-        startingData.startingBudget = Number(startingData.startingBudget)
-        openDB();
+        startingData = JSON.parse(JSON.stringify(data.data));
+        startingData.startingBudget = Number(startingData.startingBudget);
+        startingData.packagingLeadTime = Number(startingData.packagingLeadTime)
+        openDB(startingData);
     }
     resetRequest.onerror = function (event) {
 
@@ -126,14 +128,14 @@ self.onmessage = async (e) => {
 
 function setPreOrder(data) {
     const store = new ObjectStore(db, "settings")
-    
-    store.getLastIndex("settings", id=>{
-        if(id>1) {
+
+    store.getLastIndex("settings", id => {
+        if (id > 1) {
             store.deleteOne(id);
         }
         store.addOne(data)
     })
-    
+
 }
 
 function getFilteredPurchases(data) {

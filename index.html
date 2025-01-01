@@ -41,12 +41,15 @@
                     </nav>
                     <section>
                         <form action="" id="orderGenSettings">
+
                             <label for="startDateInput">Start Date</label>
                             <input type="date" name="startDate" id="startDateInput" value="2023-01-01">
                             <label for="endDateInput">End Date</label>
                             <input type="date" name="endDate" id="endDateInput" value="2023-04-01">
                             <label for="startingBudgetInput">Starting Budget</label>
                             <input type="number" name="startingBudget" id="startingBudgetInput" value="5000">
+                            <label for="packagingLeadTime">Lead time for packaging deliveries</label>
+                            <input type="number" name="packagingLeadTime" id="packagingLeadTimeInput" min="0" value="5">
                             <input type="submit" value="Re-generate Data">
                         </form>
                     </section>

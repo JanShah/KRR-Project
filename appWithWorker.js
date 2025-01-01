@@ -13,12 +13,14 @@ async function start() {
         const startDate = e.target.startDateInput.value
         const endDate = e.target.endDateInput.value
         const startingBudget = e.target.startingBudgetInput.value
+        debugger
+        const packagingLeadTime = e.target.packagingLeadTimeInput.value
         document.getElementById("message").innerText = "Restarting..."
         overlay.classList.remove('hidden')
         setTimeout(() => {
             dbWorker.postMessage({
                 action: "regen", data: {
-                    startDate, endDate, startingBudget
+                    startDate, endDate, startingBudget, packagingLeadTime
                 }
             })
         }, 500)
