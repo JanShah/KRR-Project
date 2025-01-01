@@ -106,6 +106,8 @@ self.onmessage = async (e) => {
             return getInvoices();
         case "getSummary":
             return getCounts();
+        case "pre-order":
+            return setPreOrder(e.data.data);
         case "complete":
             self.postMessage({ type: "completed" });
             break;
@@ -121,6 +123,18 @@ self.onmessage = async (e) => {
             return null;
     }
 };
+
+function setPreOrder(data) {
+    const store = new ObjectStore(db, "settings")
+    
+    store.getLastIndex("settings", id=>{
+        if(id>1) {
+            store.deleteOne(id);
+        }
+        store.addOne(data)
+    })
+    
+}
 
 function getFilteredPurchases(data) {
     new ObjectStore(db, "settings").getOne(1, handledSettings.bind(data))
@@ -278,7 +292,7 @@ function getCustomers() {
 
 }
 
-function getPackaging(postBack="packaging") {
+function getPackaging(postBack = "packaging") {
     new ObjectStore(db, "boxes").getData((boxes) => {
         self.postMessage({ type: postBack, boxes })
     });
