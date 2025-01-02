@@ -32,7 +32,7 @@ importScripts(
     "lib/processPayments.js",
     "lib/salesOrderPayment.js",
     "lib/backOrderItems.js",
-    "lib/runadviserModule.js"
+    "lib/runAdviserModule.js"
 );
 const DEBUG = false;
 var db;
