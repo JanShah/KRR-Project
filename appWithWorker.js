@@ -10,17 +10,18 @@ async function start() {
     };
     document.getElementById('orderGenSettings').addEventListener('submit', function (e) {
         e.preventDefault();
+
         const startDate = e.target.startDateInput.value
         const endDate = e.target.endDateInput.value
         const startingBudget = e.target.startingBudgetInput.value
-        debugger
         const packagingLeadTime = e.target.packagingLeadTimeInput.value
+        const useAdviser = e.target.useLastAdviser.checked
         document.getElementById("message").innerText = "Restarting..."
         overlay.classList.remove('hidden')
         setTimeout(() => {
             dbWorker.postMessage({
                 action: "regen", data: {
-                    startDate, endDate, startingBudget, packagingLeadTime
+                    startDate, endDate, startingBudget, packagingLeadTime, useAdviser
                 }
             })
         }, 500)

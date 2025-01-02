@@ -31,15 +31,17 @@ importScripts(
     "lib/Record.js",
     "lib/processPayments.js",
     "lib/salesOrderPayment.js",
-    "lib/backOrderItems.js"
+    "lib/backOrderItems.js",
+    "lib/runadviserModule.js"
 );
 const DEBUG = false;
 var db;
 // var startingData = { startDate: "2023-01-01", endDate: "2023-04-01", startingBudget: 5000 }
 var shouldDBInit = false; //change this to false when done
 var request;
-openDB({ startDate: "2023-01-01", endDate: "2023-04-01", startingBudget: 5000, supplierLeadTime: 5 });
+openDB({ startDate: "2023-01-01", endDate: "2023-04-01", startingBudget: 5000, packagingLeadTime: 5, useAdviser: false });
 function openDB(startingData) {
+    shouldDBInit = startingData.shouldDBInit || shouldDBInit;
     request = indexedDB.open("salesDB", 1);
     request.onerror = function (event) {
         console.log("Error opening database");
@@ -65,18 +67,36 @@ function openDB(startingData) {
 }
 
 function resetAndStartAgain(data) {
-    db.close(e => console.log(e))
-    debugger
-    resetRequest = indexedDB.deleteDatabase("salesDB");
-    resetRequest.onsuccess = function (event) {
-        startingData = JSON.parse(JSON.stringify(data.data));
-        startingData.startingBudget = Number(startingData.startingBudget);
-        startingData.packagingLeadTime = Number(startingData.packagingLeadTime)
-        openDB(startingData);
-    }
-    resetRequest.onerror = function (event) {
 
-        console.log("An Error occurred")
+    if (data.data.useAdviser) {
+        //get the stock quantity in now. 
+        new ObjectStore(db, "settings").getOne(2, preorder => {
+            reset(preorder)
+        });
+
+    } else {
+        reset()
+    }
+
+    function reset(preorder = undefined) {
+        db.close(e => console.log(e))
+        const resetRequest = indexedDB.deleteDatabase("salesDB");
+        resetRequest.onsuccess = (function (event) {
+            
+            startingData = JSON.parse(JSON.stringify(data.data));
+            startingData.startingBudget = Number(startingData.startingBudget);
+            startingData.packagingLeadTime = Number(startingData.packagingLeadTime)
+            startingData.preorder = preorder
+            if (preorder) {
+                startingData.shouldDBInit = true
+            }
+            
+            openDB(startingData);
+        }).bind(reset)
+        resetRequest.onerror = function (event) {
+
+            console.log("An Error occurred")
+        }
     }
 
 }
@@ -141,6 +161,7 @@ function setPreOrder(data) {
 function getFilteredPurchases(data) {
     new ObjectStore(db, "settings").getOne(1, handledSettings.bind(data))
     function handledSettings(settings) {
+        if(!settings) debugger
         settings.supplier = this.query.supplier
         settings.days = this.query.noOfDays
         settings.postBack = this.query.postBack
@@ -153,10 +174,7 @@ function getFilteredPurchases(data) {
     }
     function completeSearch(data) {
         const end = new Date(this.endDate);
-
-        const dataset = [];
         const prior = [];
-        const future = [];
         data.forEach(order => {
             order.products.forEach(p => {
                 const orderData = {
@@ -165,21 +183,16 @@ function getFilteredPurchases(data) {
                     qty: Math.floor(p.units / p.product.pack),
                     paid: p.lineTotal,
                 }
-                if (daysBetween(end, order.date) > this.days)
-                    prior.push(orderData)
-                else
-                    future.push(orderData)
+                prior.push(orderData)
             });
         })
         this.prior = prior
-        this.future = future;
         new ObjectStore(db, "boxes").getData(postAll.bind(this))
         function postAll(boxes) {
             self.postMessage({
                 type: this.postBack,
                 data: {
                     prior: aggregateWeekly(this.prior, this.startDate),
-                    future: aggregateWeekly(this.future, this.startDate),
                     boxes
                 },
             });
@@ -188,6 +201,7 @@ function getFilteredPurchases(data) {
 }
 
 function aggregateWeekly(purchaseOrders, startDate) {
+    debugger
     const year = new Date(startDate).getFullYear();
     const weeklyData = {};
     purchaseOrders.forEach(({ date, code, qty }) => {
