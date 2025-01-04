@@ -268,8 +268,44 @@ form#parameters .options label {
     max-width: 300px;
 }
 
+#bayesianChartBtns button {
+    border-radius: 0;
+    margin: 1px;
+    border: 1px solid #333;
+    width: 52px;
+    padding: 3px;
+    background-color: #e1e7ee;
+}
+
+#bayesianChartBtns button:hover {
+    background-color: #e1eaf3;
+}
+
+#bayesianChartBtns button:active {
+    background-color: #f6f9fc;
+}
+
+#bayesianChartBtns button.selected {
+    background-color: #c2f5ae;
+}
+
+
+
+
+
 table.legend {
     white-space: nowrap;
     font-size: large;
     padding: 10px 0;
+}
+
+@media(max-width:1200px) {
+    #advisers {
+        flex-direction: column-reverse;
+    }
+    #bayesianChartBtns {
+        max-width: 900px;
+        margin: 0 auto;
+    }
+    
 }

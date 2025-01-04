@@ -34,7 +34,7 @@ importScripts(
     "lib/backOrderItems.js",
     "lib/runAdviserModule.js"
 );
-const DEBUG = false;
+let DEBUG = false;
 var db;
 // var startingData = { startDate: "2023-01-01", endDate: "2023-04-01", startingBudget: 5000 }
 var shouldDBInit = false; //change this to false when done
@@ -161,7 +161,7 @@ function setPreOrder(data) {
 function getFilteredPurchases(data) {
     new ObjectStore(db, "settings").getOne(1, handledSettings.bind(data))
     function handledSettings(settings) {
-        if(!settings) debugger
+        if(!settings) if (DEBUG) debugger
         settings.supplier = this.query.supplier
         settings.days = this.query.noOfDays
         settings.postBack = this.query.postBack
@@ -173,7 +173,6 @@ function getFilteredPurchases(data) {
             this.supplier === result.supplier.supplier_id
     }
     function completeSearch(data) {
-        const end = new Date(this.endDate);
         const prior = [];
         data.forEach(order => {
             order.products.forEach(p => {
@@ -201,7 +200,6 @@ function getFilteredPurchases(data) {
 }
 
 function aggregateWeekly(purchaseOrders, startDate) {
-    debugger
     const year = new Date(startDate).getFullYear();
     const weeklyData = {};
     purchaseOrders.forEach(({ date, code, qty }) => {
@@ -274,7 +272,6 @@ function getSuppliers() {
 function getSales() {
     new ObjectStore(db, "sales").getData(sales => {
         const allKeys = ["paidDate", "id", "customer", "count", "total", "packageUsed", "status"]
-        debugger
         const salesData = sales.map(i => {
             const arr = []
             allKeys.forEach(key => {
