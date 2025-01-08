@@ -38,7 +38,8 @@ window.addEventListener('hashchange', e => {
     window.scrollTo(0, 0);
 });
 
-document.getElementById('openMenu').addEventListener('change', (e) => {
-    const marginLeft = e.target.checked ? "251px" : "0px";
-    document.getElementsByTagName('main')[0].style.marginLeft = marginLeft
-})
+// detrimental to ui, just skip it. 
+// document.getElementById('openMenu').addEventListener('change', (e) => {
+//     const marginLeft = e.target.checked ? "251px" : "0px";
+//     document.getElementsByTagName('main')[0].style.marginLeft = marginLeft
+// })
